@@ -17,6 +17,10 @@ if [[ ! -f "$INPUT_FILE" ]]; then
   exit 1
 fi
 
+# ==== カウンタ初期化 ====
+MATCHED=0
+MISMATCHED=0
+
 # ==== レコードごとの比較処理 ====
 while read -r NAME TYPE; do
   [[ -z "$NAME" || -z "$TYPE" || "$NAME" == \#* ]] && continue  # 空行やコメント行スキップ
@@ -30,16 +34,23 @@ while read -r NAME TYPE; do
   dig @$NS2 "$NAME" "$TYPE" +short | sort > "$TMP2"
 
   if diff -q "$TMP1" "$TMP2" > /dev/null; then
-    echo "✔ 一致しています"
+    echo "✅ 一致しています"
+    ((MATCHED++))
   else
     echo "❌ 差分があります:"
     echo "--- $NS1 の応答 ---"
     cat "$TMP1"
     echo "--- $NS2 の応答 ---"
     cat "$TMP2"
+    ((MISMATCHED++))
   fi
 
   rm "$TMP1" "$TMP2"
   echo
 
 done < "$INPUT_FILE"
+
+# ==== 結果サマリ ====
+echo "===== 結果集計 ====="
+echo "✅ 一致: $MATCHED 件"
+echo "❌ 不一致: $MISMATCHED 件"
