@@ -30,7 +30,7 @@ mail.example.com TXT
 
 ```
 === チェック中: example.com (A) ===
-✔ 一致しています
+✅ 一致しています
 
 === チェック中: www.example.com (CNAME) ===
 ❌ 差分があります:
